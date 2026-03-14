@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+/* ================ CrowdFix Design Tokens ================ */
+:root {
+  --color-primary: #6366f1;
+  --color-primary-dark: #4f46e5;
+  --color-secondary: #06b6d4;
+  --color-accent: #f59e0b;
+  --color-bg: #0f172a;
+  --color-surface: #1e293b;
+  --color-surface-2: #334155;
+  --color-text: #f1f5f9;
+  --color-text-muted: #94a3b8;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ================ Base ================ */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+}
