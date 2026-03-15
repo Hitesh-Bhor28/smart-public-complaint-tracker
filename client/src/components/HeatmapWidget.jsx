@@ -39,7 +39,7 @@ const HeatmapWidget = () => {
     : []
 
   return (
-    <div className="rounded-3xl border border-white/10 bg-white/5 p-6 text-white shadow-xl shadow-black/30">
+    <div className="relative z-0 rounded-3xl border border-white/10 bg-white/5 p-6 text-white shadow-xl shadow-black/30">
       <div className="mb-4">
         <p className="text-xs uppercase tracking-[0.4em] text-emerald-300">Heatmap</p>
         <h2 className="mt-2 text-2xl font-semibold">Complaint Density</h2>
@@ -51,7 +51,7 @@ const HeatmapWidget = () => {
         <MapContainer
           center={[19.9975, 73.7898]}
           zoom={12}
-          className="h-[400px] w-full"
+          className="z-0 h-[400px] w-full"
           scrollWheelZoom={false}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />

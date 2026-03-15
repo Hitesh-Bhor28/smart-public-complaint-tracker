@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react'
+import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet'
 import imageCompression from 'browser-image-compression'
 import { useAuth, useUser } from '@clerk/clerk-react'
+import 'leaflet/dist/leaflet.css'
 
 const ComplaintSubmit = () => {
   const { userId } = useAuth()
@@ -13,7 +15,7 @@ const ComplaintSubmit = () => {
   const sampleImageRef = useRef(null)
   const sampleIndexRef = useRef(0)
 
-  const [location, setLocation] = useState(null)
+  const [coordinates, setCoordinates] = useState({ lat: '', lng: '' })
   const [locationStatus, setLocationStatus] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
   const [successMessage, setSuccessMessage] = useState('')
@@ -30,6 +32,20 @@ const ComplaintSubmit = () => {
     'https://res.cloudinary.com/demo/image/upload/park.jpg',
   ]
 
+  const MapClickHandler = () => {
+    useMapEvents({
+      click(event) {
+        setCoordinates({
+          lat: event.latlng.lat,
+          lng: event.latlng.lng,
+        })
+        setLocationStatus('Location selected on map.')
+      },
+    })
+
+    return null
+  }
+
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
       setLocationStatus('Geolocation is not supported by your browser.')
@@ -39,11 +55,10 @@ const ComplaintSubmit = () => {
     setLocationStatus('Fetching location...')
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        const nextLocation = {
+        setCoordinates({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
-        }
-        setLocation(nextLocation)
+        })
         setLocationStatus('Location captured successfully.')
       },
       () => {
@@ -61,10 +76,18 @@ const ComplaintSubmit = () => {
     setCompressionStatus('')
     setIsUploading(false)
 
+    const latValue = coordinates.lat
+    const lngValue = coordinates.lng
+    const hasCoordinates =
+      latValue !== '' &&
+      lngValue !== '' &&
+      Number.isFinite(Number(latValue)) &&
+      Number.isFinite(Number(lngValue))
+
     const payload = {
       title: titleRef.current?.value?.trim() || '',
       description: descriptionRef.current?.value?.trim() || '',
-      location: location ? [location.lng, location.lat] : null,
+      location: hasCoordinates ? [Number(lngValue), Number(latValue)] : null,
       aiIssueType: issueTypeRef.current?.value || '',
       reporterId: userId || null,
       isAnonymous: anonymousRef.current?.checked || false,
@@ -152,7 +175,7 @@ const ComplaintSubmit = () => {
       if (anonymousRef.current) anonymousRef.current.checked = false
       if (sampleImageRef.current) sampleImageRef.current.checked = false
 
-      setLocation(null)
+      setCoordinates({ lat: '', lng: '' })
       setLocationStatus('')
       setSuccessMessage('Complaint submitted successfully.')
       setUploadProgress(100)
@@ -283,16 +306,43 @@ const ComplaintSubmit = () => {
           </label>
 
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <div>
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="space-y-3">
                 <p className="text-sm font-semibold text-white/80">Location</p>
-                <p className="text-xs text-white/60">
-                  {location
-                    ? `Location captured: Lat ${location.lat.toFixed(5)}, Lng ${location.lng.toFixed(5)}`
-                    : 'No location captured yet.'}
-                </p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-[0.2em] text-white/50">
+                      Latitude
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={coordinates.lat}
+                      onChange={(event) =>
+                        setCoordinates((prev) => ({ ...prev, lat: event.target.value }))
+                      }
+                      placeholder="18.5204"
+                      className="w-full rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/30"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-[0.2em] text-white/50">
+                      Longitude
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={coordinates.lng}
+                      onChange={(event) =>
+                        setCoordinates((prev) => ({ ...prev, lng: event.target.value }))
+                      }
+                      placeholder="73.8567"
+                      className="w-full rounded-xl border border-white/10 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/30 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/30"
+                    />
+                  </div>
+                </div>
                 {locationStatus ? (
-                  <p className="mt-2 text-xs text-emerald-200">{locationStatus}</p>
+                  <p className="text-xs text-emerald-200">{locationStatus}</p>
                 ) : null}
               </div>
               <button
@@ -302,6 +352,25 @@ const ComplaintSubmit = () => {
               >
                 Get My Location
               </button>
+            </div>
+            <div className="mt-4 overflow-hidden rounded-2xl border border-white/10">
+              <MapContainer
+                center={[
+                  coordinates.lat !== '' ? Number(coordinates.lat) : 18.5204,
+                  coordinates.lng !== '' ? Number(coordinates.lng) : 73.8567,
+                ]}
+                zoom={12}
+                className="h-64 w-full"
+                scrollWheelZoom={false}
+              >
+                <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+                <MapClickHandler />
+                {coordinates.lat !== '' && coordinates.lng !== '' ? (
+                  <Marker
+                    position={[Number(coordinates.lat), Number(coordinates.lng)]}
+                  />
+                ) : null}
+              </MapContainer>
             </div>
           </div>
 
