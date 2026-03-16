@@ -4,7 +4,9 @@ import imageCompression from 'browser-image-compression'
 import { useAuth, useUser } from '@clerk/clerk-react'
 import 'leaflet/dist/leaflet.css'
 
-const ComplaintSubmit = () => {
+const DEFAULT_CAMPUS_CENTER = [18.5204, 73.8567]
+
+const TicketSubmit = () => {
   const { userId } = useAuth()
   const { user } = useUser()
   const titleRef = useRef(null)
@@ -67,7 +69,7 @@ const ComplaintSubmit = () => {
     )
   }
 
-  const handleComplaintSubmit = async (event) => {
+  const handleTicketSubmit = async (event) => {
     event.preventDefault()
 
     setErrorMessage('')
@@ -112,7 +114,7 @@ const ComplaintSubmit = () => {
     }
 
     if (!payload.reporterId) {
-      setErrorMessage('Please sign in before submitting a complaint.')
+      setErrorMessage('Please sign in before submitting a maintenance ticket.')
       return
     }
 
@@ -140,9 +142,10 @@ const ComplaintSubmit = () => {
         setCompressionStatus('')
         formData.append('image', compressedFile)
       }
+
       const response = await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest()
-        xhr.open('POST', 'http://localhost:7777/api/complaints/create')
+        xhr.open('POST', 'http://localhost:7777/api/tickets/create')
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
             const percent = Math.round((event.loaded / event.total) * 100)
@@ -155,7 +158,7 @@ const ComplaintSubmit = () => {
       })
 
       if (response.status < 200 || response.status >= 300) {
-        let errorText = 'Unable to submit complaint. Please try again.'
+        let errorText = 'Unable to submit ticket. Please try again.'
         try {
           const errorBody = JSON.parse(response.responseText)
           if (errorBody?.message) {
@@ -177,7 +180,7 @@ const ComplaintSubmit = () => {
 
       setCoordinates({ lat: '', lng: '' })
       setLocationStatus('')
-      setSuccessMessage('Complaint submitted successfully.')
+      setSuccessMessage('Maintenance ticket submitted successfully.')
       setUploadProgress(100)
       setTimeout(() => setUploadProgress(0), 800)
     } catch (error) {
@@ -193,15 +196,15 @@ const ComplaintSubmit = () => {
       <div className="w-full max-w-2xl rounded-3xl border border-white/10 bg-white/5 p-8 text-white shadow-2xl shadow-black/40">
         <div className="mb-8">
           <p className="text-xs uppercase tracking-[0.4em] text-emerald-300">
-            Citizen Report
+            Student/Faculty Report
           </p>
-          <h1 className="mt-3 text-3xl font-semibold">Submit a Complaint</h1>
+          <h1 className="mt-3 text-3xl font-semibold">Submit a Maintenance Ticket</h1>
           <p className="mt-2 text-sm text-white/70">
-            Share the issue details and help the city resolve it faster.
+            Report campus facility issues so the maintenance team can resolve them quickly.
           </p>
         </div>
 
-        <form className="space-y-6" onSubmit={handleComplaintSubmit}>
+        <form className="space-y-6" onSubmit={handleTicketSubmit}>
           {errorMessage ? (
             <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
               {errorMessage}
@@ -226,28 +229,29 @@ const ComplaintSubmit = () => {
               </div>
             </div>
           ) : null}
+
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white/80" htmlFor="complaint-title">
+            <label className="text-sm font-medium text-white/80" htmlFor="ticket-title">
               Title
             </label>
             <input
-              id="complaint-title"
+              id="ticket-title"
               ref={titleRef}
               type="text"
-              placeholder="Short headline for the issue"
+              placeholder="Short summary of the issue"
               className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/30"
             />
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-medium text-white/80" htmlFor="complaint-description">
+            <label className="text-sm font-medium text-white/80" htmlFor="ticket-description">
               Description
             </label>
             <textarea
-              id="complaint-description"
+              id="ticket-description"
               ref={descriptionRef}
               rows="5"
-              placeholder="Describe the issue and any nearby landmarks"
+              placeholder="Describe the issue, location landmarks, and urgency"
               className="w-full resize-none rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white placeholder:text-white/40 focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/30"
             />
           </div>
@@ -265,10 +269,11 @@ const ComplaintSubmit = () => {
               <option value="" disabled>
                 Select an issue type
               </option>
-              <option value="Pothole">Pothole</option>
-              <option value="Garbage Overflow">Garbage Overflow</option>
-              <option value="Water Leakage">Water Leakage</option>
-              <option value="Streetlight Failure">Streetlight Failure</option>
+              <option value="IT/Network">IT/Network</option>
+              <option value="Electrical">Electrical</option>
+              <option value="Plumbing">Plumbing</option>
+              <option value="Furniture/Structural">Furniture/Structural</option>
+              <option value="AC/HVAC">AC/HVAC</option>
               <option value="Other">Other</option>
             </select>
           </div>
@@ -308,7 +313,7 @@ const ComplaintSubmit = () => {
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="space-y-3">
-                <p className="text-sm font-semibold text-white/80">Location</p>
+                <p className="text-sm font-semibold text-white/80">Campus Location</p>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="space-y-2">
                     <label className="text-xs uppercase tracking-[0.2em] text-white/50">
@@ -355,20 +360,19 @@ const ComplaintSubmit = () => {
             </div>
             <div className="mt-4 overflow-hidden rounded-2xl border border-white/10">
               <MapContainer
-                center={[
-                  coordinates.lat !== '' ? Number(coordinates.lat) : 18.5204,
-                  coordinates.lng !== '' ? Number(coordinates.lng) : 73.8567,
-                ]}
-                zoom={12}
+                center={
+                  coordinates.lat !== '' && coordinates.lng !== ''
+                    ? [Number(coordinates.lat), Number(coordinates.lng)]
+                    : DEFAULT_CAMPUS_CENTER
+                }
+                zoom={16}
                 className="h-64 w-full"
                 scrollWheelZoom={false}
               >
                 <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
                 <MapClickHandler />
                 {coordinates.lat !== '' && coordinates.lng !== '' ? (
-                  <Marker
-                    position={[Number(coordinates.lat), Number(coordinates.lng)]}
-                  />
+                  <Marker position={[Number(coordinates.lat), Number(coordinates.lng)]} />
                 ) : null}
               </MapContainer>
             </div>
@@ -381,7 +385,7 @@ const ComplaintSubmit = () => {
               isUploading ? 'bg-emerald-500/60' : 'bg-emerald-500 hover:bg-emerald-400'
             }`}
           >
-            {isUploading ? 'Submitting...' : 'Submit Complaint'}
+            {isUploading ? 'Submitting...' : 'Submit Maintenance Ticket'}
           </button>
         </form>
       </div>
@@ -389,4 +393,4 @@ const ComplaintSubmit = () => {
   )
 }
 
-export default ComplaintSubmit
+export default TicketSubmit

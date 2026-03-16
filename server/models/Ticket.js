@@ -1,16 +1,16 @@
 const mongoose = require("mongoose");
 
-const complaintSchema = new mongoose.Schema(
+const ticketSchema = new mongoose.Schema(
     {
         title: {
             type: String,
-            required: [true, "Complaint title is required"],
+            required: [true, "Ticket title is required"],
             trim: true,
             maxlength: [150, "Title cannot exceed 150 characters"],
         },
         description: {
             type: String,
-            required: [true, "Complaint description is required"],
+            required: [true, "Ticket description is required"],
             trim: true,
             maxlength: [2000, "Description cannot exceed 2000 characters"],
         },
@@ -53,12 +53,11 @@ const complaintSchema = new mongoose.Schema(
         category: {
             type: String,
             enum: [
-                "Pothole",
-                "Garbage Overflow",
-                "Water Leakage",
-                "Streetlight Failure",
-                "Road Damage",
-                "Drainage Issue",
+                "IT/Network",
+                "Electrical",
+                "Plumbing",
+                "Furniture/Structural",
+                "AC/HVAC",
                 "Other",
             ],
             default: "Other",
@@ -95,6 +94,6 @@ const complaintSchema = new mongoose.Schema(
 );
 
 // Create 2dsphere index for geospatial queries
-complaintSchema.index({ location: "2dsphere" });
+ticketSchema.index({ location: "2dsphere" });
 
-module.exports = mongoose.model("Complaint", complaintSchema);
+module.exports = mongoose.model("Ticket", ticketSchema);

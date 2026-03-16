@@ -33,7 +33,7 @@ app.get("/api/health", (_req, res) => {
     res.status(200).json({ success: true, message: "CrowdFix API is running 🚀" });
 });
 
-app.use("/api/complaints", require("./routes/complaintRoutes"));
+app.use("/api/tickets", require("./routes/ticketRoutes"));
 
 // --------------- Error Handling ---------------
 app.use(errorHandler);

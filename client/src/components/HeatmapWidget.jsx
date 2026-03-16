@@ -22,18 +22,18 @@ const HeatmapLayer = ({ points }) => {
 }
 
 const HeatmapWidget = () => {
-  const complaintsList = useSelector((store) => store.complaints?.complaintsList)
+  const ticketsList = useSelector((store) => store.tickets?.ticketsList)
 
-  const formattedPoints = Array.isArray(complaintsList)
-    ? complaintsList
+  const formattedPoints = Array.isArray(ticketsList)
+    ? ticketsList
         .filter(
-          (complaint) =>
-            Array.isArray(complaint.location?.coordinates) &&
-            complaint.location.coordinates.length === 2,
+          (ticket) =>
+            Array.isArray(ticket.location?.coordinates) &&
+            ticket.location.coordinates.length === 2,
         )
-        .map((complaint) => [
-          complaint.location.coordinates[1],
-          complaint.location.coordinates[0],
+        .map((ticket) => [
+          ticket.location.coordinates[1],
+          ticket.location.coordinates[0],
           500,
         ])
     : []
@@ -42,15 +42,15 @@ const HeatmapWidget = () => {
     <div className="relative z-0 rounded-3xl border border-white/10 bg-white/5 p-6 text-white shadow-xl shadow-black/30">
       <div className="mb-4">
         <p className="text-xs uppercase tracking-[0.4em] text-emerald-300">Heatmap</p>
-        <h2 className="mt-2 text-2xl font-semibold">Complaint Density</h2>
+        <h2 className="mt-2 text-2xl font-semibold">Maintenance Ticket Density</h2>
         <p className="mt-1 text-sm text-white/70">
-          Visualize complaint hotspots across the city in real time.
+          Visualize facility issue hotspots across the campus.
         </p>
       </div>
       <div className="overflow-hidden rounded-2xl border border-white/10">
         <MapContainer
-          center={[19.9975, 73.7898]}
-          zoom={12}
+          center={[18.5204, 73.8567]}
+          zoom={16}
           className="z-0 h-[400px] w-full"
           scrollWheelZoom={false}
         >

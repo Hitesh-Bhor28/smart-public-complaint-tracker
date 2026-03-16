@@ -3,38 +3,37 @@ import { Link } from 'react-router-dom'
 function FieldWorkerView() {
     return (
         <div className="min-h-screen p-8">
-            <nav className="flex items-center justify-between mb-8">
-                <Link to="/" className="text-[var(--color-text-muted)] hover:text-white transition-colors">
-                    ← Back to Home
+            <nav className="mb-8 flex items-center justify-between">
+                <Link to="/" className="text-[var(--color-text-muted)] transition-colors hover:text-white">
+                    Back to Home
                 </Link>
-                <h1 className="text-2xl font-bold text-[var(--color-primary)]">Field Worker View</h1>
+                <h1 className="text-2xl font-bold text-[var(--color-primary)]">Maintenance Staff View</h1>
             </nav>
 
-            <div className="max-w-4xl mx-auto">
-                <div className="bg-[var(--color-surface)] rounded-2xl p-8 border border-[var(--color-surface-2)]">
-                    <h2 className="text-xl font-semibold mb-4">🔧 Assigned Tasks</h2>
+            <div className="mx-auto max-w-4xl">
+                <div className="rounded-2xl border border-[var(--color-surface-2)] bg-[var(--color-surface)] p-8">
+                    <h2 className="mb-4 text-xl font-semibold">Assigned Tasks</h2>
                     <p className="text-[var(--color-text-muted)]">
-                        This view will show assigned complaints to field workers,
-                        provide GPS navigation to issue locations, and allow
-                        workers to upload resolution proof photos.
+                        This view will show assigned maintenance tickets, provide
+                        navigation to campus locations, and allow staff to upload
+                        proof of resolution.
                     </p>
 
-                    {/* Placeholder sections */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-                        <div className="bg-[var(--color-surface-2)] rounded-xl p-6 text-center">
-                            <p className="text-3xl mb-2">📬</p>
-                            <p className="font-medium">My Tasks</p>
-                            <p className="text-sm text-[var(--color-text-muted)]">Assigned complaints</p>
+                    <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+                        <div className="rounded-xl bg-[var(--color-surface-2)] p-6 text-center">
+                            <p className="mb-2 text-3xl">My Tasks</p>
+                            <p className="font-medium">Assigned tickets</p>
+                            <p className="text-sm text-[var(--color-text-muted)]">Work queue</p>
                         </div>
-                        <div className="bg-[var(--color-surface-2)] rounded-xl p-6 text-center">
-                            <p className="text-3xl mb-2">🧭</p>
-                            <p className="font-medium">Navigate</p>
-                            <p className="text-sm text-[var(--color-text-muted)]">GPS directions to location</p>
+                        <div className="rounded-xl bg-[var(--color-surface-2)] p-6 text-center">
+                            <p className="mb-2 text-3xl">Navigate</p>
+                            <p className="font-medium">Campus directions</p>
+                            <p className="text-sm text-[var(--color-text-muted)]">Get to the location</p>
                         </div>
-                        <div className="bg-[var(--color-surface-2)] rounded-xl p-6 text-center">
-                            <p className="text-3xl mb-2">✅</p>
-                            <p className="font-medium">Submit Proof</p>
-                            <p className="text-sm text-[var(--color-text-muted)]">Upload resolution photos</p>
+                        <div className="rounded-xl bg-[var(--color-surface-2)] p-6 text-center">
+                            <p className="mb-2 text-3xl">Submit Proof</p>
+                            <p className="font-medium">Resolution updates</p>
+                            <p className="text-sm text-[var(--color-text-muted)]">Upload completion photos</p>
                         </div>
                     </div>
                 </div>

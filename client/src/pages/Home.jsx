@@ -15,16 +15,15 @@ try {
 
 function Home() {
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center">
-            {/* Navigation */}
-            <nav className="fixed top-0 w-full flex items-center justify-between px-8 py-4 bg-[var(--color-surface)]/80 backdrop-blur-md z-50">
-                <h1 className="text-xl font-bold text-[var(--color-primary)]">🏙️ CrowdFix</h1>
+        <div className="flex min-h-screen flex-col items-center justify-center p-8 text-center">
+            <nav className="fixed top-0 z-50 flex w-full items-center justify-between bg-[var(--color-surface)]/80 px-8 py-4 backdrop-blur-md">
+                <h1 className="text-xl font-bold text-[var(--color-primary)]">Campus Facility Helpdesk</h1>
                 <div className="flex items-center gap-4">
                     {clerkAvailable ? (
                         <>
                             <SignedOut>
                                 <SignInButton mode="modal">
-                                    <button className="px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white font-medium hover:bg-[var(--color-primary-dark)] transition-colors cursor-pointer">
+                                    <button className="cursor-pointer rounded-lg bg-[var(--color-primary)] px-4 py-2 font-medium text-white transition-colors hover:bg-[var(--color-primary-dark)]">
                                         Sign In
                                     </button>
                                 </SignInButton>
@@ -34,41 +33,40 @@ function Home() {
                             </SignedIn>
                         </>
                     ) : (
-                        <span className="text-xs text-[var(--color-text-muted)] bg-[var(--color-surface-2)] px-3 py-1 rounded-full">
-                            Auth disabled — add Clerk key
+                        <span className="rounded-full bg-[var(--color-surface-2)] px-3 py-1 text-xs text-[var(--color-text-muted)]">
+                            Auth disabled -- add Clerk key
                         </span>
                     )}
                 </div>
             </nav>
 
-            {/* Hero */}
-            <div className="max-w-2xl mt-16">
-                <h2 className="text-5xl font-extrabold mb-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent">
-                    Smart Public Complaint &amp; Issue Tracker
+            <div className="mt-16 max-w-2xl">
+                <h2 className="mb-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-5xl font-extrabold text-transparent">
+                    Campus Facility Maintenance Helpdesk
                 </h2>
-                <p className="text-lg text-[var(--color-text-muted)] mb-10">
-                    Report infrastructure issues, track resolutions, and help your community
-                    — all powered by location intelligence and AI.
+                <p className="mb-10 text-lg text-[var(--color-text-muted)]">
+                    Report campus facility issues, track resolutions, and keep the campus
+                    running smoothly with real-time updates.
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <div className="flex flex-col justify-center gap-4 sm:flex-row">
                     <Link
-                        to="/citizen"
-                        className="px-6 py-3 rounded-xl bg-[var(--color-primary)] text-white font-semibold hover:bg-[var(--color-primary-dark)] transition-colors"
+                        to="/"
+                        className="rounded-xl bg-[var(--color-primary)] px-6 py-3 font-semibold text-white transition-colors hover:bg-[var(--color-primary-dark)]"
                     >
-                        🧑‍💼 Citizen View
+                        Student/Faculty View
                     </Link>
                     <Link
                         to="/admin"
-                        className="px-6 py-3 rounded-xl bg-[var(--color-surface-2)] text-white font-semibold hover:bg-[var(--color-surface)] transition-colors border border-[var(--color-surface-2)]"
+                        className="rounded-xl border border-[var(--color-surface-2)] bg-[var(--color-surface-2)] px-6 py-3 font-semibold text-white transition-colors hover:bg-[var(--color-surface)]"
                     >
-                        🛡️ Admin Dashboard
+                        Facilities Manager
                     </Link>
                     <Link
-                        to="/field-worker"
-                        className="px-6 py-3 rounded-xl bg-[var(--color-surface-2)] text-white font-semibold hover:bg-[var(--color-surface)] transition-colors border border-[var(--color-surface-2)]"
+                        to="/worker"
+                        className="rounded-xl border border-[var(--color-surface-2)] bg-[var(--color-surface-2)] px-6 py-3 font-semibold text-white transition-colors hover:bg-[var(--color-surface)]"
                     >
-                        🔧 Field Worker
+                        Maintenance Staff
                     </Link>
                 </div>
             </div>

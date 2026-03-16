@@ -7,30 +7,30 @@ const statusStyles = {
   resolved: 'bg-emerald-500/15 text-emerald-200 border-emerald-500/30',
 }
 
-const ComplaintCard = ({ complaint }) => {
-  if (!complaint) return null
+const TicketCard = ({ ticket }) => {
+  if (!ticket) return null
 
   const { userId } = useAuth()
-  const [upvotes, setUpvotes] = useState(complaint.upvotes ?? 0)
+  const [upvotes, setUpvotes] = useState(ticket.upvotes ?? 0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [message, setMessage] = useState('')
   const [showImage, setShowImage] = useState(false)
 
-  const statusKey = String(complaint.status || 'Pending').toLowerCase()
+  const statusKey = String(ticket.status || 'Pending').toLowerCase()
   const statusClass = statusStyles[statusKey] || statusStyles.pending
 
   const hasUpvoted = useMemo(() => {
     if (!userId) return false
-    return Array.isArray(complaint.upvotedBy) && complaint.upvotedBy.includes(userId)
-  }, [complaint.upvotedBy, userId])
+    return Array.isArray(ticket.upvotedBy) && ticket.upvotedBy.includes(userId)
+  }, [ticket.upvotedBy, userId])
 
   useEffect(() => {
-    setUpvotes(complaint.upvotes ?? 0)
-  }, [complaint.upvotes])
+    setUpvotes(ticket.upvotes ?? 0)
+  }, [ticket.upvotes])
 
   const handleUpvote = async () => {
     if (!userId) {
-      setMessage('Sign in to upvote this complaint.')
+      setMessage('Sign in to upvote this ticket.')
       return
     }
 
@@ -42,7 +42,7 @@ const ComplaintCard = ({ complaint }) => {
     setMessage('')
     try {
       const response = await fetch(
-        `http://localhost:7777/api/complaints/${complaint._id || complaint.id}/upvote`,
+        `http://localhost:7777/api/tickets/${ticket._id || ticket.id}/upvote`,
         {
           method: 'POST',
           headers: {
@@ -68,12 +68,12 @@ const ComplaintCard = ({ complaint }) => {
     }
   }
 
-  const coordinates = complaint.location?.coordinates
+  const coordinates = ticket.location?.coordinates
   const latitude = coordinates?.[1]
   const longitude = coordinates?.[0]
-  const issueType = complaint.aiDetectedIssueType || complaint.category || 'Other'
-  const reportedBy = complaint.reportedByDisplay || complaint.reportedBy || 'Anonymous'
-  const createdAt = complaint.createdAt ? new Date(complaint.createdAt) : null
+  const issueType = ticket.aiDetectedIssueType || ticket.category || 'Other'
+  const reportedBy = ticket.reportedByDisplay || ticket.reportedBy || 'Anonymous'
+  const createdAt = ticket.createdAt ? new Date(ticket.createdAt) : null
   const createdLabel = createdAt
     ? createdAt.toLocaleString(undefined, {
         month: 'short',
@@ -84,17 +84,17 @@ const ComplaintCard = ({ complaint }) => {
       })
     : 'Just now'
 
-  const imageUrl = Array.isArray(complaint.imageUrls) ? complaint.imageUrls[0] : null
+  const imageUrl = Array.isArray(ticket.imageUrls) ? ticket.imageUrls[0] : null
 
   return (
     <article className="rounded-2xl border border-white/10 bg-white/5 p-6 text-white shadow-xl shadow-black/30">
       <div className="flex items-center justify-between gap-4">
-        <h3 className="text-lg font-semibold text-white">{complaint.title}</h3>
+        <h3 className="text-lg font-semibold text-white">{ticket.title}</h3>
         <span className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-wide ${statusClass}`}>
-          {complaint.status || 'Open'}
+          {ticket.status || 'Open'}
         </span>
       </div>
-      <p className="mt-3 text-sm text-white/70">{complaint.description}</p>
+      <p className="mt-3 text-sm text-white/70">{ticket.description}</p>
       <div className="mt-4 grid gap-3 text-xs text-white/60 sm:grid-cols-2">
         <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
           <p className="text-[10px] uppercase tracking-[0.25em] text-white/40">Issue Type</p>
@@ -131,7 +131,7 @@ const ComplaintCard = ({ complaint }) => {
             <div className="mt-3 overflow-hidden rounded-xl border border-white/10">
               <img
                 src={imageUrl}
-                alt={complaint.title}
+                alt={ticket.title}
                 loading="lazy"
                 className="h-56 w-full object-cover"
               />
@@ -159,4 +159,4 @@ const ComplaintCard = ({ complaint }) => {
   )
 }
 
-export default ComplaintCard
+export default TicketCard

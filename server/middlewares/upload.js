@@ -11,7 +11,7 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary,
     params: {
-        folder: 'complaint_tracker',
+        folder: 'campus_helpdesk',
         allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
     },
 });

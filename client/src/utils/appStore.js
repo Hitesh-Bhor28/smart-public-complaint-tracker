@@ -1,11 +1,11 @@
 import { configureStore } from '@reduxjs/toolkit'
 import userReducer from './userSlice'
-import complaintReducer from './complaintSlice'
+import ticketReducer from './ticketSlice'
 
 const appStore = configureStore({
   reducer: {
     user: userReducer,
-    complaints: complaintReducer,
+    tickets: ticketReducer,
   },
 })
 

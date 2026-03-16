@@ -3,8 +3,8 @@ import RootLayout from './RootLayout'
 import CitizenView from '../pages/CitizenView'
 import AdminDashboard from '../pages/AdminDashboard'
 import FieldWorkerView from '../pages/FieldWorkerView'
-import ComplaintSubmitPage from '../pages/ComplaintSubmitPage'
-import ComplaintFeedPage from '../pages/ComplaintFeedPage'
+import TicketSubmitPage from '../pages/TicketSubmitPage'
+import TicketFeedPage from '../pages/TicketFeedPage'
 
 const appRouter = createBrowserRouter([
   {
@@ -24,12 +24,12 @@ const appRouter = createBrowserRouter([
         element: <FieldWorkerView />,
       },
       {
-        path: '/complaint/submit',
-        element: <ComplaintSubmitPage />,
+        path: '/tickets/submit',
+        element: <TicketSubmitPage />,
       },
       {
-        path: '/complaints',
-        element: <ComplaintFeedPage />,
+        path: '/tickets',
+        element: <TicketFeedPage />,
       },
     ],
   },

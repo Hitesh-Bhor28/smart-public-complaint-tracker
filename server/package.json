@@ -1,7 +1,7 @@
 {
     "name": "crowdfix-server",
     "version": "1.0.0",
-    "description": "Backend API for CrowdFix - Smart Public Complaint & Issue Tracker",
+    "description": "Backend API for Campus Facility Maintenance Helpdesk",
     "main": "server.js",
     "scripts": {
         "start": "node server.js",

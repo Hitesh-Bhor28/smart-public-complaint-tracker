@@ -20,48 +20,48 @@ const STATUS_COLORS = {
 }
 
 const AnalyticsWidget = () => {
-  const complaintsList = useSelector((store) => store.complaints?.complaintsList) || []
+  const ticketsList = useSelector((store) => store.tickets?.ticketsList) || []
 
-  const { totalComplaints, totalResolved, totalPending, statusData, issueData } = useMemo(() => {
-    const totalComplaints = complaintsList.length
-    const statusCounts = complaintsList.reduce(
-      (acc, complaint) => {
-        const status = complaint.status || 'Pending'
+  const { totalTickets, totalResolved, totalPending, statusData, issueData } = useMemo(() => {
+    const totalTickets = ticketsList.length
+    const statusCounts = ticketsList.reduce(
+      (acc, ticket) => {
+        const status = ticket.status || 'Pending'
         acc[status] = (acc[status] || 0) + 1
         return acc
       },
       { Pending: 0, 'In Progress': 0, Resolved: 0 },
     )
 
-    const issueCounts = complaintsList.reduce((acc, complaint) => {
-      const issue = complaint.aiDetectedIssueType || complaint.category || 'Other'
+    const issueCounts = ticketsList.reduce((acc, ticket) => {
+      const issue = ticket.aiDetectedIssueType || ticket.category || 'Other'
       acc[issue] = (acc[issue] || 0) + 1
       return acc
     }, {})
 
     return {
-      totalComplaints,
+      totalTickets,
       totalResolved: statusCounts.Resolved || 0,
       totalPending: statusCounts.Pending || 0,
       statusData: Object.entries(statusCounts).map(([name, value]) => ({ name, value })),
       issueData: Object.entries(issueCounts).map(([name, value]) => ({ name, value })),
     }
-  }, [complaintsList])
+  }, [ticketsList])
 
   return (
     <section className="rounded-3xl border border-white/10 bg-white/5 p-6 text-white shadow-xl shadow-black/30">
       <div className="mb-6">
         <p className="text-xs uppercase tracking-[0.4em] text-emerald-300">Analytics</p>
-        <h2 className="mt-2 text-2xl font-semibold">Complaints Overview</h2>
+        <h2 className="mt-2 text-2xl font-semibold">Maintenance Tickets Overview</h2>
         <p className="mt-1 text-sm text-white/70">
-          Track complaint volume, status performance, and issue distribution.
+          Track ticket volume, status performance, and issue distribution.
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/40">Total Complaints</p>
-          <p className="mt-3 text-3xl font-semibold">{totalComplaints}</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-white/40">Total Tickets</p>
+          <p className="mt-3 text-3xl font-semibold">{totalTickets}</p>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
           <p className="text-xs uppercase tracking-[0.3em] text-white/40">Total Resolved</p>
