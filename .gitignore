@@ -15,7 +15,7 @@ dist-ssr
 .vscode
 .env
 README.md
-
+autopush.ps1
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
