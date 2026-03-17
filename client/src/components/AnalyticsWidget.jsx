@@ -15,14 +15,16 @@ import {
 
 const STATUS_COLORS = {
   Pending: '#f59e0b',
-  'In Progress': '#38bdf8',
-  Resolved: '#22c55e',
+  Assigned: '#38bdf8',
+  'In Progress': '#6366f1',
+  Completed: '#14b8a6',
+  Closed: '#22c55e',
 }
 
 const AnalyticsWidget = () => {
   const ticketsList = useSelector((store) => store.tickets?.ticketsList) || []
 
-  const { totalTickets, totalResolved, totalPending, statusData, issueData } = useMemo(() => {
+  const { totalTickets, totalClosed, totalPending, statusData, issueData } = useMemo(() => {
     const totalTickets = ticketsList.length
     const statusCounts = ticketsList.reduce(
       (acc, ticket) => {
@@ -30,7 +32,7 @@ const AnalyticsWidget = () => {
         acc[status] = (acc[status] || 0) + 1
         return acc
       },
-      { Pending: 0, 'In Progress': 0, Resolved: 0 },
+      { Pending: 0, Assigned: 0, 'In Progress': 0, Completed: 0, Closed: 0 },
     )
 
     const issueCounts = ticketsList.reduce((acc, ticket) => {
@@ -41,7 +43,7 @@ const AnalyticsWidget = () => {
 
     return {
       totalTickets,
-      totalResolved: statusCounts.Resolved || 0,
+      totalClosed: statusCounts.Closed || 0,
       totalPending: statusCounts.Pending || 0,
       statusData: Object.entries(statusCounts).map(([name, value]) => ({ name, value })),
       issueData: Object.entries(issueCounts).map(([name, value]) => ({ name, value })),
@@ -64,8 +66,8 @@ const AnalyticsWidget = () => {
           <p className="mt-3 text-3xl font-semibold">{totalTickets}</p>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-          <p className="text-xs uppercase tracking-[0.3em] text-white/40">Total Resolved</p>
-          <p className="mt-3 text-3xl font-semibold text-emerald-200">{totalResolved}</p>
+          <p className="text-xs uppercase tracking-[0.3em] text-white/40">Total Closed</p>
+          <p className="mt-3 text-3xl font-semibold text-emerald-200">{totalClosed}</p>
         </div>
         <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
           <p className="text-xs uppercase tracking-[0.3em] text-white/40">Total Pending</p>

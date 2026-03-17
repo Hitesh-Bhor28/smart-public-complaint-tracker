@@ -76,6 +76,15 @@ function AdminDashboard() {
     }
   }
 
+  const getResolvedLabel = (ticket) => {
+    if (!ticket?.resolvedAt) return null
+    try {
+      return new Date(ticket.resolvedAt).toLocaleString()
+    } catch (error) {
+      return null
+    }
+  }
+
   return (
     <div className="min-h-screen p-8">
       <nav className="mb-8 flex items-center justify-between">
@@ -175,13 +184,18 @@ function AdminDashboard() {
           onClick={() => setSelectedTicket(null)}
         >
           <div
-            className="w-full max-w-2xl rounded-2xl border border-white/10 bg-slate-950 p-6 text-white shadow-2xl"
+            className="w-full max-w-3xl rounded-2xl border border-white/10 bg-slate-950 p-6 text-white shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs uppercase tracking-[0.4em] text-emerald-300">Maintenance Ticket</p>
                 <h3 className="mt-2 text-2xl font-semibold">{selectedTicket.title}</h3>
+                {selectedTicket.resolvedAt ? (
+                  <p className="mt-2 text-xs text-emerald-200">
+                    Resolved at: {getResolvedLabel(selectedTicket)}
+                  </p>
+                ) : null}
               </div>
               <button
                 type="button"
@@ -208,6 +222,20 @@ function AdminDashboard() {
                   className="h-64 w-full object-cover"
                   loading="lazy"
                 />
+              </div>
+            ) : null}
+
+            {Array.isArray(selectedTicket.resolutionImageUrls) && selectedTicket.resolutionImageUrls[0] ? (
+              <div className="mt-6">
+                <p className="text-xs uppercase tracking-[0.3em] text-white/50">Resolution Proof</p>
+                <div className="mt-3 overflow-hidden rounded-2xl border border-white/10">
+                  <img
+                    src={selectedTicket.resolutionImageUrls[0]}
+                    alt="Resolution proof"
+                    className="h-64 w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
               </div>
             ) : null}
           </div>

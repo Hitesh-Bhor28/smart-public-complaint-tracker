@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import imageCompression from 'browser-image-compression'
 import { useDispatch, useSelector } from 'react-redux'
 import { useAuth, useUser } from '@clerk/clerk-react'
 import useAssignedTasks from '../hooks/useAssignedTasks'
@@ -8,7 +9,7 @@ const statusColors = {
   Pending: 'bg-amber-500/20 text-amber-200',
   Assigned: 'bg-sky-500/20 text-sky-200',
   'In Progress': 'bg-indigo-500/20 text-indigo-200',
-  Resolved: 'bg-emerald-500/20 text-emerald-200',
+  Completed: 'bg-emerald-500/20 text-emerald-200',
 }
 
 const StaffDashboard = () => {
@@ -19,6 +20,8 @@ const StaffDashboard = () => {
   const role = user?.publicMetadata?.role || user?.unsafeMetadata?.role
   const assignedTasks = useSelector((store) => store.tasks?.assignedTasks) || []
   const [updatingId, setUpdatingId] = useState(null)
+  const [proofFiles, setProofFiles] = useState({})
+  const [compressionMessage, setCompressionMessage] = useState('')
 
   const handleStatusUpdate = async (taskId, nextStatus) => {
     if (!taskId || !nextStatus) return
@@ -43,13 +46,55 @@ const StaffDashboard = () => {
         .map((task) =>
           task._id === taskId || task.id === taskId ? { ...task, status: nextStatus } : task,
         )
-        .filter((task) => task.status !== 'Resolved')
+        .filter((task) => task.status !== 'Closed')
 
       dispatch(addTasks(updated))
     } catch (error) {
       console.error('Failed to update task status', error)
     } finally {
       setUpdatingId(null)
+    }
+  }
+
+  const handleResolveWithProof = async (taskId) => {
+    const file = proofFiles[taskId]
+    if (!file) return
+
+    setUpdatingId(taskId)
+    setCompressionMessage('Compressing resolution photo...')
+    try {
+      const options = { maxSizeMB: 2, maxWidthOrHeight: 1920, useWebWorker: true }
+      const compressedFile = await imageCompression(file, options)
+      setCompressionMessage('')
+
+      const formData = new FormData()
+      formData.append('image', compressedFile)
+
+      const response = await fetch(`http://localhost:7777/api/issues/${taskId}/resolve`, {
+        method: 'POST',
+        headers: {
+          'x-user-id': userId || '',
+          'x-user-role': role || '',
+        },
+        body: formData,
+      })
+
+      if (!response.ok) {
+        return
+      }
+
+      const updated = assignedTasks.filter((task) => (task._id || task.id) !== taskId)
+      dispatch(addTasks(updated))
+      setProofFiles((prev) => {
+        const next = { ...prev }
+        delete next[taskId]
+        return next
+      })
+    } catch (error) {
+      console.error('Failed to resolve task', error)
+    } finally {
+      setUpdatingId(null)
+      setCompressionMessage('')
     }
   }
 
@@ -104,6 +149,10 @@ const StaffDashboard = () => {
               Location: {Array.isArray(task.location?.coordinates) ? 'On Campus' : 'Not set'}
             </div>
 
+            {compressionMessage ? (
+              <p className="mt-3 text-xs text-emerald-200">{compressionMessage}</p>
+            ) : null}
+
             <div className="mt-4 flex flex-wrap gap-2">
               {isAssigned ? (
                 <button
@@ -116,14 +165,30 @@ const StaffDashboard = () => {
                 </button>
               ) : null}
               {isInProgress ? (
-                <button
-                  type="button"
-                  disabled={isUpdating}
-                  onClick={() => handleStatusUpdate(task._id || task.id, 'Resolved')}
-                  className="rounded-full border border-emerald-400/50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-200 transition hover:border-emerald-300 hover:text-white"
-                >
-                  {isUpdating ? 'Updating...' : 'Mark Resolved'}
-                </button>
+                <div className="flex flex-1 flex-col gap-2">
+                  <label className="text-xs uppercase tracking-[0.2em] text-white/50">
+                    Upload Completion Photo
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(event) =>
+                      setProofFiles((prev) => ({
+                        ...prev,
+                        [task._id || task.id]: event.target.files?.[0] || null,
+                      }))
+                    }
+                    className="w-full rounded-xl border border-dashed border-white/20 bg-white/5 px-3 py-2 text-xs text-white file:mr-3 file:rounded-full file:border-0 file:bg-emerald-500 file:px-3 file:py-1 file:text-[10px] file:font-semibold file:text-white hover:file:bg-emerald-400"
+                  />
+                  <button
+                    type="button"
+                    disabled={isUpdating || !proofFiles[task._id || task.id]}
+                    onClick={() => handleResolveWithProof(task._id || task.id)}
+                    className="rounded-full border border-emerald-400/50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-emerald-200 transition hover:border-emerald-300 hover:text-white"
+                  >
+                    {isUpdating ? 'Updating...' : 'Submit Proof'}
+                  </button>
+                </div>
               ) : null}
             </div>
           </article>

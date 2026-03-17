@@ -1,3 +1,4 @@
+const Issue = require("../models/Issue");
 const Ticket = require("../models/Ticket");
 
 const getUserRole = (req) =>
@@ -27,7 +28,7 @@ const getAssignedTasks = async (req, res) => {
 
     const tasks = await Ticket.find({
       assignedTo: userId,
-      status: { $ne: "Resolved" },
+      status: { $ne: "Closed" },
     }).sort({ createdAt: -1 });
 
     res.status(200).json({ data: tasks });
@@ -57,6 +58,10 @@ const updateTaskStatus = async (req, res) => {
       return res.status(400).json({ message: "Status is required" });
     }
 
+    if (status === "Completed" || status === "Closed") {
+      return res.status(400).json({ message: "Resolution proof is required" });
+    }
+
     const updated = await Ticket.findOneAndUpdate(
       { _id: id, assignedTo: userId },
       { status },
@@ -73,4 +78,77 @@ const updateTaskStatus = async (req, res) => {
   }
 };
 
-module.exports = { getAssignedTasks, updateTaskStatus };
+// @desc    Resolve task with proof
+// @route   POST /api/issues/:id/resolve
+// @access  Private
+const resolveTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const role = getUserRole(req);
+    const userId =
+      req.auth?.userId ||
+      req.user?.id ||
+      req.headers["x-user-id"];
+
+    if (role !== "worker") {
+      return res.status(403).json({ message: "Worker access only" });
+    }
+
+    if (!req.file?.path) {
+      return res.status(400).json({ message: "Resolution photo is required" });
+    }
+
+    const updated = await Ticket.findOneAndUpdate(
+      { _id: id, assignedTo: userId },
+      {
+        status: "Completed",
+        resolvedAt: new Date(),
+        $push: { resolutionImageUrls: req.file.path },
+      },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    res.status(200).json({ data: updated });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to resolve task" });
+  }
+};
+
+// @desc    Student confirms resolution
+// @route   PATCH /api/issues/confirm/:issueId
+// @access  Public (reporter)
+const confirmResolution = async (req, res) => {
+  try {
+    const { issueId } = req.params;
+    const userId =
+      req.auth?.userId ||
+      req.user?.id ||
+      req.headers["x-user-id"];
+
+    const ticket = await Ticket.findById(issueId);
+    if (!ticket) {
+      return res.status(404).json({ message: "Ticket not found" });
+    }
+
+    if (ticket.status !== "Completed") {
+      return res.status(400).json({ message: "Ticket is not ready for confirmation" });
+    }
+
+    if (userId && ticket.reportedBy && ticket.reportedBy !== userId) {
+      return res.status(403).json({ message: "Only the reporter can confirm" });
+    }
+
+    ticket.status = "Closed";
+    await ticket.save();
+
+    res.status(200).json({ data: ticket });
+  } catch (error) {
+    res.status(500).json({ message: "Failed to confirm resolution" });
+  }
+};
+
+module.exports = { getAssignedTasks, updateTaskStatus, resolveTask, confirmResolution };

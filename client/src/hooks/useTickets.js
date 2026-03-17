@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import { addTickets } from '../utils/ticketSlice'
+import { addIssues } from '../utils/issueSlice'
 
 const useTickets = () => {
   const dispatch = useDispatch()
@@ -17,6 +18,7 @@ const useTickets = () => {
         const data = await response.json()
         const tickets = data?.data ?? []
         dispatch(addTickets(tickets))
+        dispatch(addIssues(tickets))
       } catch (error) {
         console.error('Failed to fetch tickets', error)
       }

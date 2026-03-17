@@ -150,8 +150,8 @@ const upvoteTicket = async (req, res, next) => {
             return res.status(404).json({ message: "Ticket not found" });
         }
 
-        if (ticket.status === "Resolved") {
-            return res.status(400).json({ message: "Resolved tickets cannot be upvoted" });
+        if (ticket.status === "Completed" || ticket.status === "Closed") {
+            return res.status(400).json({ message: "Completed tickets cannot be upvoted" });
         }
 
         if (ticket.upvotedBy.includes(userId)) {

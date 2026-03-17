@@ -6,6 +6,8 @@ const statusStyles = {
   assigned: 'bg-sky-500/15 text-sky-200 border-sky-500/30',
   'in progress': 'bg-indigo-500/15 text-indigo-200 border-indigo-500/30',
   resolved: 'bg-emerald-500/15 text-emerald-200 border-emerald-500/30',
+  completed: 'bg-teal-500/15 text-teal-200 border-teal-500/30',
+  closed: 'bg-emerald-500/20 text-emerald-100 border-emerald-400/40',
 }
 
 const TicketCard = ({ ticket }) => {
@@ -19,7 +21,8 @@ const TicketCard = ({ ticket }) => {
 
   const statusKey = String(ticket.status || 'Pending').toLowerCase()
   const statusClass = statusStyles[statusKey] || statusStyles.pending
-  const isResolved = statusKey === 'resolved'
+  const isResolved = statusKey === 'resolved' || statusKey === 'completed' || statusKey === 'closed'
+  const resolvedLabel = statusKey === 'closed' ? 'Closed' : statusKey === 'completed' ? 'Completed' : 'Resolved'
 
   const hasUpvoted = useMemo(() => {
     if (!userId) return false
@@ -32,7 +35,7 @@ const TicketCard = ({ ticket }) => {
 
   const handleUpvote = async () => {
     if (isResolved) {
-      setMessage('Resolved tickets cannot be upvoted.')
+      setMessage('Completed tickets cannot be upvoted.')
       return
     }
 
@@ -80,6 +83,7 @@ const TicketCard = ({ ticket }) => {
   const longitude = coordinates?.[0]
   const issueType = ticket.aiDetectedIssueType || ticket.category || 'Other'
   const reportedBy = ticket.reportedByDisplay || ticket.reportedBy || 'Anonymous'
+  const assignedToName = ticket.assignedToName || null
   const createdAt = ticket.createdAt ? new Date(ticket.createdAt) : null
   const createdLabel = createdAt
     ? createdAt.toLocaleString(undefined, {
@@ -118,6 +122,10 @@ const TicketCard = ({ ticket }) => {
         <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
           <p className="text-[10px] uppercase tracking-[0.25em] text-white/40">Reported By</p>
           <p className="mt-1 text-sm text-white">{reportedBy}</p>
+        </div>
+        <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-white/40">Assigned To</p>
+          <p className="mt-1 text-sm text-white">{assignedToName || 'Not assigned yet'}</p>
         </div>
         <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-2">
           <p className="text-[10px] uppercase tracking-[0.25em] text-white/40">Reported At</p>
@@ -161,7 +169,7 @@ const TicketCard = ({ ticket }) => {
                 : 'border-white/20 text-white/70 hover:border-emerald-300 hover:text-white'
           }`}
         >
-          {isResolved ? 'Resolved' : hasUpvoted ? 'Upvoted' : isSubmitting ? 'Upvoting...' : 'Upvote'}
+          {isResolved ? resolvedLabel : hasUpvoted ? 'Upvoted' : isSubmitting ? 'Upvoting...' : 'Upvote'}
         </button>
       </div>
       {message ? <p className="mt-2 text-xs text-emerald-200">{message}</p> : null}
