@@ -17,27 +17,28 @@
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-/* ================ Base ================ */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-body {
-  font-family: var(--font-sans);
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  min-height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-a {
-  color: var(--color-primary);
-  text-decoration: none;
-}
+  a {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
 
-a:hover {
-  color: var(--color-primary-dark);
+  a:hover {
+    color: var(--color-primary-dark);
+  }
 }

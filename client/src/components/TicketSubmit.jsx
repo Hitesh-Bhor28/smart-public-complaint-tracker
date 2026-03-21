@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { MapContainer, Marker, TileLayer, useMapEvents } from 'react-leaflet'
 import imageCompression from 'browser-image-compression'
 import { useAuth, useUser } from '@clerk/clerk-react'
+import { toast } from 'react-toastify'
 import 'leaflet/dist/leaflet.css'
 
 const DEFAULT_CAMPUS_CENTER = [18.5204, 73.8567]
@@ -19,8 +20,6 @@ const TicketSubmit = () => {
 
   const [coordinates, setCoordinates] = useState({ lat: '', lng: '' })
   const [locationStatus, setLocationStatus] = useState('')
-  const [errorMessage, setErrorMessage] = useState('')
-  const [successMessage, setSuccessMessage] = useState('')
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
   const [compressionStatus, setCompressionStatus] = useState('')
@@ -50,7 +49,7 @@ const TicketSubmit = () => {
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
-      setLocationStatus('Geolocation is not supported by your browser.')
+      toast.error('Geolocation is not supported by your browser.')
       return
     }
 
@@ -62,9 +61,11 @@ const TicketSubmit = () => {
           lng: position.coords.longitude,
         })
         setLocationStatus('Location captured successfully.')
+        toast.success('Location captured successfully.')
       },
       () => {
         setLocationStatus('Unable to retrieve your location.')
+        toast.error('Unable to retrieve your location.')
       },
     )
   }
@@ -72,8 +73,6 @@ const TicketSubmit = () => {
   const handleTicketSubmit = async (event) => {
     event.preventDefault()
 
-    setErrorMessage('')
-    setSuccessMessage('')
     setUploadProgress(0)
     setCompressionStatus('')
     setIsUploading(false)
@@ -99,22 +98,22 @@ const TicketSubmit = () => {
     }
 
     if (!payload.title || !payload.description) {
-      setErrorMessage('Please enter a title and description before submitting.')
+      toast.error('Please enter a title and description before submitting.')
       return
     }
 
     if (!payload.aiIssueType) {
-      setErrorMessage('Please select an issue type before submitting.')
+      toast.error('Please select an issue type before submitting.')
       return
     }
 
     if (!payload.location) {
-      setErrorMessage('Please capture your location before submitting.')
+      toast.error('Please capture your location before submitting.')
       return
     }
 
     if (!payload.reporterId) {
-      setErrorMessage('Please sign in before submitting a maintenance ticket.')
+      toast.error('Please sign in before submitting a maintenance ticket.')
       return
     }
 
@@ -167,7 +166,7 @@ const TicketSubmit = () => {
         } catch (error) {
           // Ignore JSON parse errors and show default message
         }
-        setErrorMessage(errorText)
+        toast.error(errorText)
         return
       }
 
@@ -180,11 +179,11 @@ const TicketSubmit = () => {
 
       setCoordinates({ lat: '', lng: '' })
       setLocationStatus('')
-      setSuccessMessage('Maintenance ticket submitted successfully.')
+      toast.success('Maintenance ticket submitted successfully!')
       setUploadProgress(100)
       setTimeout(() => setUploadProgress(0), 800)
     } catch (error) {
-      setErrorMessage('Something went wrong while submitting. Please try again.')
+      toast.error('Something went wrong while submitting. Please try again.')
     } finally {
       setIsUploading(false)
       setCompressionStatus('')
@@ -205,16 +204,6 @@ const TicketSubmit = () => {
         </div>
 
         <form className="space-y-6" onSubmit={handleTicketSubmit}>
-          {errorMessage ? (
-            <div className="rounded-xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-              {errorMessage}
-            </div>
-          ) : null}
-          {successMessage ? (
-            <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-200">
-              {successMessage}
-            </div>
-          ) : null}
           {uploadProgress > 0 ? (
             <div className="rounded-xl border border-white/10 bg-white/5 px-4 py-3">
               <div className="flex items-center justify-between text-xs text-white/60">
@@ -264,7 +253,7 @@ const TicketSubmit = () => {
               id="issue-type"
               ref={issueTypeRef}
               defaultValue=""
-              className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/30"
+              className="w-full rounded-xl border border-white/10 bg-white/10 px-4 py-3 text-sm text-white focus:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/30 [&>option]:bg-slate-900"
             >
               <option value="" disabled>
                 Select an issue type
