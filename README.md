@@ -2,6 +2,15 @@
 
 CampusFix is a campus facility maintenance helpdesk that lets students and faculty report issues, enables facilities managers to triage and assign work, and helps maintenance staff resolve tickets with photo proof. The platform provides end-to-end visibility into every maintenance request lifecycle.
 
+## Screenshots
+![Dashboard overview](screenshots/1dashboard.png)
+![Analytics dashboard](screenshots/2dashboard.png)
+![Auth flow](screenshots/3auth.png)
+![Admin overview](screenshots/4.png)
+![Ticket feed](screenshots/5.png)
+![Staff workflow](screenshots/6.png)
+![Submit ticket](screenshots/7.png)
+
 ## Highlights
 - Role-based experiences for Students/Faculty, Facilities Managers, and Maintenance Staff
 - Ticket submission with photos, geolocation, and anonymous reporting
