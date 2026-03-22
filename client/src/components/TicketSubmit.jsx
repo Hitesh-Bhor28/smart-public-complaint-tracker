@@ -15,23 +15,12 @@ const TicketSubmit = () => {
   const issueTypeRef = useRef(null)
   const imageRef = useRef(null)
   const anonymousRef = useRef(null)
-  const sampleImageRef = useRef(null)
-  const sampleIndexRef = useRef(0)
 
   const [coordinates, setCoordinates] = useState({ lat: '', lng: '' })
   const [locationStatus, setLocationStatus] = useState('')
   const [uploadProgress, setUploadProgress] = useState(0)
   const [isUploading, setIsUploading] = useState(false)
   const [compressionStatus, setCompressionStatus] = useState('')
-
-  const uploadMode = import.meta.env.VITE_IMAGE_UPLOAD_MODE || 'real'
-  const forceSampleImage = uploadMode === 'sample'
-
-  const sampleImages = [
-    'https://res.cloudinary.com/demo/image/upload/sample.jpg',
-    'https://res.cloudinary.com/demo/image/upload/balloons.jpg',
-    'https://res.cloudinary.com/demo/image/upload/park.jpg',
-  ]
 
   const MapClickHandler = () => {
     useMapEvents({
@@ -94,7 +83,6 @@ const TicketSubmit = () => {
       isAnonymous: anonymousRef.current?.checked || false,
       reportedByDisplay: user?.fullName || null,
       imageFile: imageRef.current?.files?.[0] || null,
-      useSampleImage: forceSampleImage || sampleImageRef.current?.checked || false,
     }
 
     if (!payload.title || !payload.description) {
@@ -129,12 +117,7 @@ const TicketSubmit = () => {
       if (payload.reportedByDisplay) {
         formData.append('reportedByDisplay', payload.reportedByDisplay)
       }
-      if (payload.useSampleImage) {
-        const index = sampleIndexRef.current % sampleImages.length
-        const selectedUrl = sampleImages[index]
-        sampleIndexRef.current += 1
-        formData.append('imageUrls', JSON.stringify([selectedUrl]))
-      } else if (payload.imageFile) {
+      if (payload.imageFile) {
         setCompressionStatus('Compressing image...')
         const options = { maxSizeMB: 2, maxWidthOrHeight: 1920, useWebWorker: true }
         const compressedFile = await imageCompression(payload.imageFile, options)
@@ -175,7 +158,6 @@ const TicketSubmit = () => {
       if (issueTypeRef.current) issueTypeRef.current.value = ''
       if (imageRef.current) imageRef.current.value = ''
       if (anonymousRef.current) anonymousRef.current.checked = false
-      if (sampleImageRef.current) sampleImageRef.current.checked = false
 
       setCoordinates({ lat: '', lng: '' })
       setLocationStatus('')
@@ -287,16 +269,6 @@ const TicketSubmit = () => {
               className="h-4 w-4 rounded border-white/20 bg-white/10 text-emerald-400 focus:ring-emerald-400/40"
             />
             Show my name as Anonymous in the feed
-          </label>
-          <label className="flex items-center gap-3 text-sm text-white/70">
-            <input
-              ref={sampleImageRef}
-              type="checkbox"
-              defaultChecked={forceSampleImage}
-              disabled={forceSampleImage}
-              className="h-4 w-4 rounded border-white/20 bg-white/10 text-emerald-400 focus:ring-emerald-400/40"
-            />
-            {forceSampleImage ? 'Sample image mode enabled (dev)' : 'Use sample image (testing only)'}
           </label>
 
           <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
